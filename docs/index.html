@@ -1,195 +1,174 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="transition-colors duration-300">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Clínica Roriz Linhares – Booking & Engagement</title>
     <!-- Tailwind via CDN (prototype) -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = { darkMode: 'class' };
+    </script>
   </head>
-  <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col items-center p-4">
+  <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen flex flex-col items-center p-4">
     <!-- Role selection overlay (first visit) -->
-    <section
-      id="roleOverlay"
-      class="fixed inset-0 bg-white/90 backdrop-blur-sm flex flex-col justify-center items-center gap-8 z-50 hidden"
-    >
+    <section id="roleOverlay" class="fixed inset-0 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm flex flex-col justify-center items-center gap-8 z-50 hidden">
       <div class="text-center">
-        <h2 class="text-2xl font-bold mb-2">Welcome!</h2>
-        <p class="text-gray-600">Please select your role:</p>
+        <h2 id="txtWelcome" class="text-2xl font-bold mb-2">Welcome!</h2>
+        <p id="txtSelectRole" class="text-gray-600 dark:text-gray-400">Please select your role:</p>
       </div>
       <div class="flex flex-col sm:flex-row gap-4">
-        <button
-          id="btnPatient"
-          class="px-6 py-3 rounded-xl bg-emerald-600 text-white font-medium hover:bg-emerald-700 transition"
-        >
-          I'm a Patient
-        </button>
-        <button
-          id="btnStaff"
-          class="px-6 py-3 rounded-xl bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition"
-        >
-          I'm Staff
-        </button>
+        <button id="btnPatient" class="px-6 py-3 rounded-xl bg-emerald-600 text-white font-medium hover:bg-emerald-700 transition">I'm a Patient</button>
+        <button id="btnStaff" class="px-6 py-3 rounded-xl bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition">I'm Staff</button>
       </div>
     </section>
 
-    <header class="w-full max-w-3xl mb-6 text-center">
-      <h1 class="text-3xl font-bold mb-2">Clínica Roriz Linhares</h1>
-      <p class="text-lg text-gray-600">Self‑service booking & engagement dashboard</p>
+    <!-- Header with theme, language & logoff -->
+    <header class="w-full max-w-3xl mb-6 flex items-center justify-between">
+      <div class="text-center flex-1">
+        <h1 class="text-3xl font-bold mb-1">Clínica Roriz Linhares</h1>
+        <p id="txtSubtitle" class="text-lg text-gray-600 dark:text-gray-400">Self‑service booking & engagement dashboard</p>
+      </div>
+      <div class="flex items-center gap-3 ml-4">
+        <!-- Language switch -->
+        <button id="langEn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition text-xl" title="English">🇬🇧</button>
+        <button id="langPt" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition text-xl" title="Português">🇧🇷</button>
+        <button id="langEs" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition text-xl" title="Español">🇪🇸</button>
+        <!-- Theme toggle -->
+        <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition" title="Theme">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path id="iconThemePath" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707M17.657 17.657l.707.707M12 5a7 7 0 000 14 7 7 0 000-14z" />
+          </svg>
+        </button>
+        <!-- Logoff -->
+        <button id="logoff" class="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-800 transition" title="Change role">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" />
+          </svg>
+        </button>
+      </div>
     </header>
 
-    <!-- Booking Wizard (staff can book for any patient, patients can book for themselves) -->
-    <section id="booking" class="w-full max-w-3xl bg-white shadow rounded-2xl p-6 mb-8">
-      <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+    <!-- Booking Wizard -->
+    <section id="booking" class="w-full max-w-3xl bg-white dark:bg-gray-800 shadow rounded-2xl p-6 mb-8">
+      <h2 id="txtNewAppt" class="text-xl font-semibold mb-4 flex items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
         New Appointment
       </h2>
       <form id="bookingForm" class="grid gap-4 sm:grid-cols-3">
-        <input
-          type="text"
-          id="patientName"
-          placeholder="Patient name"
-          class="col-span-3 sm:col-span-1 border rounded p-2"
-          required
-        />
-        <input
-          type="date"
-          id="apptDate"
-          class="col-span-3 sm:col-span-1 border rounded p-2"
-          required
-        />
-        <input
-          type="time"
-          id="apptTime"
-          class="col-span-3 sm:col-span-1 border rounded p-2"
-          required
-        />
-        <button
-          type="submit"
-          class="col-span-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 rounded-lg transition"
-        >
-          Add Booking
-        </button>
+        <input type="text" id="patientName" placeholder="Patient name" class="col-span-3 sm:col-span-1 border rounded p-2 bg-transparent" required />
+        <input type="date" id="apptDate" class="col-span-3 sm:col-span-1 border rounded p-2 bg-transparent" required />
+        <input type="time" id="apptTime" class="col-span-3 sm:col-span-1 border rounded p-2 bg-transparent" required />
+        <button type="submit" id="btnAdd" class="col-span-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 rounded-lg transition">Add Booking</button>
       </form>
     </section>
 
-    <!-- Appointments List (visible only for staff) -->
-    <section id="appointments" class="w-full max-w-3xl bg-white shadow rounded-2xl p-6 mb-8 hidden">
-      <h2 class="text-xl font-semibold mb-4">All Upcoming Sessions</h2>
+    <!-- Appointments List -->
+    <section id="appointments" class="w-full max-w-3xl bg-white dark:bg-gray-800 shadow rounded-2xl p-6 mb-8 hidden">
+      <h2 id="appointmentsHeader" class="text-xl font-semibold mb-4"></h2>
       <ul id="appointmentsList" class="space-y-4"></ul>
-      <p id="emptyState" class="text-gray-500 text-center">No appointments yet.</p>
+      <p id="emptyState" class="text-gray-500 dark:text-gray-400 text-center">No appointments yet.</p>
     </section>
 
-    <footer class="text-sm text-gray-500 mt-auto py-6">
+    <footer class="text-sm text-gray-500 dark:text-gray-400 mt-auto py-6">
       Prototype for MSc AI4B – Customer Engagement & AI · Built with ❤️ & JavaScript
     </footer>
 
     <script>
-      /* ================= Role Selection ================= */
-      const ROLE_KEY = 'crl_role';
-      const overlay = document.getElementById('roleOverlay');
-      const bookingSection = document.getElementById('booking');
-      const appointmentsSection = document.getElementById('appointments');
-
-      const updateUIForRole = (role) => {
-        if (role === 'staff') {
-          appointmentsSection.classList.remove('hidden');
-          // Staff keeps the patient name input visible
-          document.getElementById('patientName').parentElement.classList.remove('hidden');
-        } else {
-          appointmentsSection.classList.add('hidden');
-          // Optionally hide patient name input for patients → auto‑fill later
-          // document.getElementById('patientName').parentElement.classList.add('hidden');
-        }
+      /* ================= Keys & Utilities ================= */
+      const KEYS = {
+        ROLE    : 'crl_role',
+        NAME    : 'crl_patient_name',
+        APPTS   : 'crl_appointments',
+        THEME   : 'crl_theme',
+        LANG    : 'crl_lang'
       };
 
-      const ensureRole = () => {
-        const savedRole = localStorage.getItem(ROLE_KEY);
-        if (!savedRole) {
-          overlay.classList.remove('hidden');
-        } else {
-          updateUIForRole(savedRole);
-        }
+      const root = document.documentElement; // cache for theme toggling
+      const $ = (sel) => document.querySelector(sel);
+
+      /* ================= Translations ================= */
+      const I18N = {
+        en: { welcome:'Welcome!', selectRole:'Please select your role:', patient:"I'm a Patient", staff:"I'm Staff", subtitle:'Self‑service booking & engagement dashboard', newAppointment:'New Appointment', patientNamePh:'Patient name', addBooking:'Add Booking', allSessions:'All Upcoming Sessions', mySessions:'My Upcoming Sessions', noAppts:'No appointments yet.' },
+        pt: { welcome:'Bem‑vindo!', selectRole:'Selecione seu papel:', patient:'Sou Paciente', staff:'Sou Funcionário', subtitle:'Agendamento e engajamento de pacientes', newAppointment:'Novo Agendamento', patientNamePh:'Nome do paciente', addBooking:'Agendar', allSessions:'Próximas Sessões', mySessions:'Minhas Sessões', noAppts:'Nenhum agendamento.' },
+        es: { welcome:'¡Bienvenido!', selectRole:'Seleccione su rol:', patient:'Soy Paciente', staff:'Soy Empleado', subtitle:'Panel de reservas y compromiso', newAppointment:'Nueva Cita', patientNamePh:'Nombre del paciente', addBooking:'Agendar', allSessions:'Próximas Sesiones', mySessions:'Mis Sesiones', noAppts:'Sin citas.' }
       };
 
-      const setRole = (role) => {
-        localStorage.setItem(ROLE_KEY, role);
-        overlay.classList.add('hidden');
-        updateUIForRole(role);
-      };
+      /* ================= Apply Theme ================= */
+      function applyTheme(theme){
+        if(theme==='dark'){ root.classList.add('dark'); $("#iconThemePath").setAttribute('d','M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z'); }
+        else{root.classList.remove('dark'); $("#iconThemePath").setAttribute('d','M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707M17.657 17.657l.707.707M12 5a7 7 0 000 14 7 7 0 000-14z'); }
+        localStorage.setItem(KEYS.THEME,theme);
+      }
 
-      document.getElementById('btnPatient').addEventListener('click', () => setRole('patient'));
-      document.getElementById('btnStaff').addEventListener('click', () => setRole('staff'));
+      /* ================= Apply Language ================= */
+      function applyLang(lang){
+        const t = I18N[lang]||I18N.en;
+        $('#txtWelcome').textContent = t.welcome;
+        $('#txtSelectRole').textContent = t.selectRole;
+        $('#btnPatient').textContent = t.patient;
+        $('#btnStaff'  ).textContent = t.staff;
+        $('#txtSubtitle').textContent = t.subtitle;
+        $('#txtNewAppt').childNodes[2].textContent = ` ${t.newAppointment}`;
+        $('#patientName').placeholder = t.patientNamePh;
+        $('#btnAdd').textContent = t.addBooking;
+        $('#emptyState').textContent = t.noAppts;
+        localStorage.setItem(KEYS.LANG,lang);
+        render();
+      }
 
-      /* ================= Data Layer ================= */
-      const STORAGE_KEY = 'crl_appointments';
-      const loadAppointments = () => JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      const saveAppointments = (data) => localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      /* ================= Storage Helpers ================= */
+      const loadAppts = () => JSON.parse(localStorage.getItem(KEYS.APPTS)||'[]');
+      const saveAppts = (data) => localStorage.setItem(KEYS.APPTS,JSON.stringify(data));
 
-      /* ================= UI & Logic ================= */
-      const list = document.getElementById('appointmentsList');
-      const emptyState = document.getElementById('emptyState');
-      const form = document.getElementById('bookingForm');
+      /* ================= Role & UI ================= */
+      function promptName(){ let n = prompt('Please enter your name')||'Anonymous'; localStorage.setItem(KEYS.NAME,n.trim()); return n.trim(); }
 
-      function render() {
-        const role = localStorage.getItem(ROLE_KEY);
-        const appts = loadAppointments().sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+      function setRole(role){ localStorage.setItem(KEYS.ROLE,role); $('#roleOverlay').classList.add('hidden'); updateUI(role); render(); }
 
-        // Patients shouldn't see other patients' names; list is hidden already, but guard anyway
-        if (role !== 'staff') return;
+      function updateUI(role){
+        const isStaff = role==='staff';
+        const hdr = $('#appointmentsHeader');
+        const lang = localStorage.getItem(KEYS.LANG)||'en';
+        const t = I18N[lang];
+        $('#appointments').classList.remove('hidden');
+        if(isStaff){ hdr.textContent = t.allSessions; $('#patientName').parentElement.classList.remove('hidden'); }
+        else { hdr.textContent = t.mySessions; if(!localStorage.getItem(KEYS.NAME)) promptName(); $('#patientName').value = localStorage.getItem(KEYS.NAME); $('#patientName').parentElement.classList.add('hidden'); }
+      }
 
-        list.innerHTML = '';
-        if (appts.length === 0) {
-          emptyState.classList.remove('hidden');
-          return;
-        }
-        emptyState.classList.add('hidden');
-        appts.forEach((a, idx) => {
+      function ensureRole(){ const r = localStorage.getItem(KEYS.ROLE); if(r){ updateUI(r); render(); } else $('#roleOverlay').classList.remove('hidden'); }
+
+      /* ================= Render ================= */
+      function render(){
+        const role = localStorage.getItem(KEYS.ROLE);
+        const me   = localStorage.getItem(KEYS.NAME);
+        let appts  = loadAppts().sort((a,b)=>new Date(a.dateTime)-new Date(b.dateTime));
+        if(role==='patient') appts = appts.filter(a=>a.name===me);
+        const list = $('#appointmentsList'); list.innerHTML='';
+        if(!appts.length){ $('#emptyState').classList.remove('hidden'); return; }
+        $('#emptyState').classList.add('hidden');
+        appts.forEach((a,idx)=>{
           const li = document.createElement('li');
-          li.className = 'flex justify-between items-center border-b pb-2 last:border-b-0';
-          li.innerHTML = `
-            <div>
-              <p class="font-medium">${a.name}</p>
-              <p class="text-sm text-gray-500">${new Date(a.dateTime).toLocaleString()}</p>
-            </div>
-            <button data-idx="${idx}" class="delete text-red-600 hover:text-red-800">Cancel</button>
-          `;
+          li.className='flex justify-between items-center border-b pb-2 last:border-b-0';
+          li.innerHTML=`<div><p class="font-medium">${a.name}</p><p class="text-sm text-gray-500 dark:text-gray-400">${new Date(a.dateTime).toLocaleString()}</p></div>${role==='staff'?`<button data-idx="${idx}" class="delete text-red-600 hover:text-red-800">Cancel</button>`:''}`;
           list.appendChild(li);
         });
       }
 
-      function addAppointment(e) {
+      /* ================= Events ================= */
+      $('#btnPatient').onclick = () => setRole('patient');
+      $('#btnStaff').onclick   = () => setRole('staff');
+
+      $('#bookingForm').addEventListener('submit',e=>{
         e.preventDefault();
-        const nameInput = document.getElementById('patientName');
-        const name = nameInput.value.trim();
-        const date = document.getElementById('apptDate').value;
-        const time = document.getElementById('apptTime').value;
-        if (!name || !date || !time) return;
-        const dateTime = new Date(`${date}T${time}`);
-        const appts = loadAppointments();
-        appts.push({ name, dateTime });
-        saveAppointments(appts);
-        form.reset();
-        render();
-      }
-
-      function deleteAppointment(idx) {
-        const appts = loadAppointments();
-        appts.splice(idx, 1);
-        saveAppointments(appts);
-        render();
-      }
-
-      form.addEventListener('submit', addAppointment);
-      list.addEventListener('click', (e) => {
-        if (e.target.matches('.delete')) {
-          deleteAppointment(e.target.dataset.idx);
-        }
+        const role = localStorage.getItem(KEYS.ROLE);
+        const name = role==='staff'?$('#patientName').value.trim():localStorage.getItem(KEYS.NAME);
+        const d    = $('#apptDate').value, t=$('#apptTime').value;
+        if(!name||!d||!t) return;
+        const appts = loadAppts(); appts.push({name,dateTime:`${d}T${t}`}); saveAppts(appts);
+        e.target.reset(); if(role==='patient') $('#patientName').value=name; render();
       });
 
-      /* Initial load */
-      ensureRole();
-      render();
-    </script>
-  </body>
-</html>
+      $('#appointmentsList').addEventListener('click',e=>{ if(e.target.matches('.delete')){ const appts=loadAppts(); appts.splice(e.target.dataset.idx,1); saveAppts(appts); render(); } });
+
+      $('#themeToggle').onclick = ()=>{
