@@ -4,10 +4,35 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Clínica Roriz Linhares – Booking & Engagement</title>
-    <!-- Tailwind via CDN (ideal for prototype) -->
+    <!-- Tailwind via CDN (prototype) -->
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col items-center p-4">
+    <!-- Role selection overlay (first visit) -->
+    <section
+      id="roleOverlay"
+      class="fixed inset-0 bg-white/90 backdrop-blur-sm flex flex-col justify-center items-center gap-8 z-50 hidden"
+    >
+      <div class="text-center">
+        <h2 class="text-2xl font-bold mb-2">Welcome!</h2>
+        <p class="text-gray-600">Please select your role:</p>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-4">
+        <button
+          id="btnPatient"
+          class="px-6 py-3 rounded-xl bg-emerald-600 text-white font-medium hover:bg-emerald-700 transition"
+        >
+          I'm a Patient
+        </button>
+        <button
+          id="btnStaff"
+          class="px-6 py-3 rounded-xl bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition"
+        >
+          I'm Staff
+        </button>
+      </div>
+    </section>
+
     <header class="w-full max-w-3xl mb-6 text-center">
       <h1 class="text-3xl font-bold mb-2">Clínica Roriz Linhares</h1>
       <p class="text-lg text-gray-600">Self‑service booking & engagement dashboard</p>
@@ -56,16 +81,35 @@
     </section>
 
     <footer class="text-sm text-gray-500 mt-auto py-6">
-      Prototype for MSc AI4B – Customer Engagement & AI · Built with ❤️ & JS
+      Prototype for MSc AI4B – Customer Engagement & AI · Built with ❤️ & JavaScript
     </footer>
 
     <script>
-      /* ========== Data Layer ========== */
+      /* ================= Role Selection ================= */
+      const ROLE_KEY = 'crl_role';
+      const overlay = document.getElementById('roleOverlay');
+
+      const ensureRole = () => {
+        if (!localStorage.getItem(ROLE_KEY)) {
+          overlay.classList.remove('hidden');
+        }
+      };
+
+      const setRole = (role) => {
+        localStorage.setItem(ROLE_KEY, role);
+        overlay.classList.add('hidden');
+        // Future: adjust UI per role (e.g., hide booking wizard for patients)
+      };
+
+      document.getElementById('btnPatient').addEventListener('click', () => setRole('patient'));
+      document.getElementById('btnStaff').addEventListener('click', () => setRole('staff'));
+
+      /* ================= Data Layer ================= */
       const STORAGE_KEY = 'crl_appointments';
       const loadAppointments = () => JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
       const saveAppointments = (data) => localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 
-      /* ========== UI & Logic ========== */
+      /* ================= UI & Logic ================= */
       const list = document.getElementById('appointmentsList');
       const emptyState = document.getElementById('emptyState');
       const form = document.getElementById('bookingForm');
@@ -120,6 +164,8 @@
         }
       });
 
+      /* Initial load */
+      ensureRole();
       render();
     </script>
   </body>
