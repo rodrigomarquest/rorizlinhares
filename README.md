@@ -1,6 +1,6 @@
 # Clínica Roriz Linhares – No-Show Reduction SPA
 
-[Live Demo](https://rodrigomarquest.github.io/rorizlinhares/) · [Project Board](https://github.com/rodrigomarquest/rorizlinhares/projects/1)
+[Live Demo](https://rodrigomarquest.github.io/rorizlinhares/) · [Project Board](https://github.com/users/rodrigomarquest/projects/1/views/1)
 
 ## About
 
