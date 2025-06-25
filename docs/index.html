@@ -311,7 +311,14 @@
 
       /* Events */
       $('#btnPatient').onclick = () => setupRole('patient');
-      $('#btnStaff').onclick = () => setupRole('staff');
+      $('#btnStaff').onclick = () => {
+        const password = prompt('Enter staff password:');
+        if (password === 'Yoda@NCI2025') {
+          setupRole('staff');
+        } else {
+          alert('Invalid password. Access denied.');
+        }
+      };
 
       $('#bookingForm').onsubmit = e => {
         e.preventDefault();
