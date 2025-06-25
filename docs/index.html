@@ -320,13 +320,29 @@
         const dateField = $('#apptDate');
         const timeField = $('#apptTime');
         
-        if (!nameField || !dateField || !timeField) return;
-        
-        const name = role === 'staff' ? nameField.value.trim() : getStoredValue(KEYS.NAME);
-        
-        if (!name) {
-          alert('Please enter a patient name.');
+        if (!dateField || !timeField) {
+          alert('Form fields not found.');
           return;
+        }
+        
+        let name;
+        if (role === 'staff') {
+          if (!nameField) {
+            alert('Patient name field not found.');
+            return;
+          }
+          name = nameField.value.trim();
+          if (!name) {
+            alert('Please enter a patient name.');
+            return;
+          }
+        } else {
+          // Patient role - get name from storage
+          name = getStoredValue(KEYS.NAME);
+          if (!name) {
+            alert('Patient name not found. Please refresh and try again.');
+            return;
+          }
         }
         
         if (!dateField.value || !timeField.value) {
@@ -339,13 +355,17 @@
         appts.push({ n: name, dt });
         save(appts);
         
-        e.target.reset();
-        
-        if (role === 'patient' && nameField) {
-          nameField.value = name;
+        // Reset form fields
+        dateField.value = '';
+        timeField.value = '';
+        if (role === 'staff' && nameField) {
+          nameField.value = '';
         }
         
         render();
+        
+        // Show success message
+        alert('Appointment booked successfully!');
       };
 
       $('#appointmentsList').onclick = e => {
