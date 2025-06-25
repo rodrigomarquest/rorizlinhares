@@ -106,7 +106,7 @@
           selectRole: 'Selecione seu papel:',
           patient: 'Sou Paciente',
           staff: 'Sou Funcionário',
-          subtitle: 'Agendamento e engajamento de pacientes',
+          subtitle: 'Agendamento self‑service e painel de engajamento',
           newAppt: 'Novo Agendamento',
           patientPh: 'Nome do paciente',
           add: 'Agendar',
@@ -119,7 +119,7 @@
           selectRole: 'Seleccione su rol:',
           patient: 'Soy Paciente',
           staff: 'Soy Empleado',
-          subtitle: 'Panel de reservas y compromiso',
+          subtitle: 'Panel de reservas autoservicio y gestión de pacientes',
           newAppt: 'Nueva Cita',
           patientPh: 'Nombre del paciente',
           add: 'Agendar',
@@ -227,27 +227,27 @@
         const appointmentsHeader = $('#appointmentsHeader');
         
         if (role === 'staff') {
-          if (patientNameContainer && patientNameContainer.parentElement) {
-            patientNameContainer.parentElement.classList.remove('hidden');
+          // Staff can see and edit patient name field
+          if (patientNameContainer) {
+            patientNameContainer.style.display = 'block';
+            patientNameContainer.value = '';
           }
           if (appointmentsHeader) {
             appointmentsHeader.textContent = t('all');
           }
         } else {
-          if (patientNameContainer && patientNameContainer.parentElement) {
-            patientNameContainer.parentElement.classList.add('hidden');
+          // Patient role: hide the name field but show the booking section
+          if (patientNameContainer) {
+            patientNameContainer.style.display = 'none';
           }
           if (appointmentsHeader) {
             appointmentsHeader.textContent = t('mine');
           }
           
+          // Get patient name if not stored
           if (!getStoredValue(KEYS.NAME)) {
             const name = prompt('Please enter your name:') || 'Anonymous';
             setStoredValue(KEYS.NAME, name);
-          }
-          
-          if (patientNameContainer) {
-            patientNameContainer.value = getStoredValue(KEYS.NAME) || '';
           }
         }
         
