@@ -38,7 +38,7 @@
       <p class="text-lg text-gray-600">Self‑service booking & engagement dashboard</p>
     </header>
 
-    <!-- Booking Wizard -->
+    <!-- Booking Wizard (staff can book for any patient, patients can book for themselves) -->
     <section id="booking" class="w-full max-w-3xl bg-white shadow rounded-2xl p-6 mb-8">
       <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
@@ -73,9 +73,9 @@
       </form>
     </section>
 
-    <!-- Appointments List -->
-    <section id="appointments" class="w-full max-w-3xl bg-white shadow rounded-2xl p-6 mb-8">
-      <h2 class="text-xl font-semibold mb-4">Upcoming Sessions</h2>
+    <!-- Appointments List (visible only for staff) -->
+    <section id="appointments" class="w-full max-w-3xl bg-white shadow rounded-2xl p-6 mb-8 hidden">
+      <h2 class="text-xl font-semibold mb-4">All Upcoming Sessions</h2>
       <ul id="appointmentsList" class="space-y-4"></ul>
       <p id="emptyState" class="text-gray-500 text-center">No appointments yet.</p>
     </section>
@@ -88,17 +88,34 @@
       /* ================= Role Selection ================= */
       const ROLE_KEY = 'crl_role';
       const overlay = document.getElementById('roleOverlay');
+      const bookingSection = document.getElementById('booking');
+      const appointmentsSection = document.getElementById('appointments');
+
+      const updateUIForRole = (role) => {
+        if (role === 'staff') {
+          appointmentsSection.classList.remove('hidden');
+          // Staff keeps the patient name input visible
+          document.getElementById('patientName').parentElement.classList.remove('hidden');
+        } else {
+          appointmentsSection.classList.add('hidden');
+          // Optionally hide patient name input for patients → auto‑fill later
+          // document.getElementById('patientName').parentElement.classList.add('hidden');
+        }
+      };
 
       const ensureRole = () => {
-        if (!localStorage.getItem(ROLE_KEY)) {
+        const savedRole = localStorage.getItem(ROLE_KEY);
+        if (!savedRole) {
           overlay.classList.remove('hidden');
+        } else {
+          updateUIForRole(savedRole);
         }
       };
 
       const setRole = (role) => {
         localStorage.setItem(ROLE_KEY, role);
         overlay.classList.add('hidden');
-        // Future: adjust UI per role (e.g., hide booking wizard for patients)
+        updateUIForRole(role);
       };
 
       document.getElementById('btnPatient').addEventListener('click', () => setRole('patient'));
@@ -115,7 +132,12 @@
       const form = document.getElementById('bookingForm');
 
       function render() {
+        const role = localStorage.getItem(ROLE_KEY);
         const appts = loadAppointments().sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+
+        // Patients shouldn't see other patients' names; list is hidden already, but guard anyway
+        if (role !== 'staff') return;
+
         list.innerHTML = '';
         if (appts.length === 0) {
           emptyState.classList.remove('hidden');
@@ -138,7 +160,8 @@
 
       function addAppointment(e) {
         e.preventDefault();
-        const name = document.getElementById('patientName').value.trim();
+        const nameInput = document.getElementById('patientName');
+        const name = nameInput.value.trim();
         const date = document.getElementById('apptDate').value;
         const time = document.getElementById('apptTime').value;
         if (!name || !date || !time) return;
