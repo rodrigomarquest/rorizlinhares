@@ -76,79 +76,95 @@
 
     <script>
       /* ================= Keys & Utilities ================= */
-      const KEYS = {
-        ROLE    : 'crl_role',
-        NAME    : 'crl_patient_name',
-        APPTS   : 'crl_appointments',
-        THEME   : 'crl_theme',
-        LANG    : 'crl_lang'
+      const KEYS = { ROLE:'crl_role', NAME:'crl_patient_name', APPTS:'crl_appointments', THEME:'crl_theme', LANG:'crl_lang' };
+      const $ = sel=>document.querySelector(sel);
+      const root=document.documentElement;
+
+      /* ================= I18N ================= */
+      const I18N={
+        en:{welcome:'Welcome!',selectRole:'Please select your role:',patient:"I'm a Patient",staff:"I'm Staff",subtitle:'Self‑service booking & engagement dashboard',newAppointment:'New Appointment',patientNamePh:'Patient name',addBooking:'Add Booking',allSessions:'All Upcoming Sessions',mySessions:'My Upcoming Sessions',noAppts:'No appointments yet.'},
+        pt:{welcome:'Bem‑vindo!',selectRole:'Selecione seu papel:',patient:'Sou Paciente',staff:'Sou Funcionário',subtitle:'Agendamento e engajamento de pacientes',newAppointment:'Novo Agendamento',patientNamePh:'Nome do paciente',addBooking:'Agendar',allSessions:'Próximas Sessões',mySessions:'Minhas Sessões',noAppts:'Nenhum agendamento.'},
+        es:{welcome:'¡Bienvenido!',selectRole:'Seleccione su rol:',patient:'Soy Paciente',staff:'Soy Empleado',subtitle:'Panel de reservas y compromiso',newAppointment:'Nueva Cita',patientNamePh:'Nombre del paciente',addBooking:'Agendar',allSessions:'Próximas Sesiones',mySessions:'Mis Sesiones',noAppts:'Sin citas.'}
       };
 
-      const root = document.documentElement; // cache for theme toggling
-      const $ = (sel) => document.querySelector(sel);
-
-      /* ================= Translations ================= */
-      const I18N = {
-        en: { welcome:'Welcome!', selectRole:'Please select your role:', patient:"I'm a Patient", staff:"I'm Staff", subtitle:'Self‑service booking & engagement dashboard', newAppointment:'New Appointment', patientNamePh:'Patient name', addBooking:'Add Booking', allSessions:'All Upcoming Sessions', mySessions:'My Upcoming Sessions', noAppts:'No appointments yet.' },
-        pt: { welcome:'Bem‑vindo!', selectRole:'Selecione seu papel:', patient:'Sou Paciente', staff:'Sou Funcionário', subtitle:'Agendamento e engajamento de pacientes', newAppointment:'Novo Agendamento', patientNamePh:'Nome do paciente', addBooking:'Agendar', allSessions:'Próximas Sessões', mySessions:'Minhas Sessões', noAppts:'Nenhum agendamento.' },
-        es: { welcome:'¡Bienvenido!', selectRole:'Seleccione su rol:', patient:'Soy Paciente', staff:'Soy Empleado', subtitle:'Panel de reservas y compromiso', newAppointment:'Nueva Cita', patientNamePh:'Nombre del paciente', addBooking:'Agendar', allSessions:'Próximas Sesiones', mySessions:'Mis Sesiones', noAppts:'Sin citas.' }
-      };
-
-      /* ================= Apply Theme ================= */
+      /* ================= Theme ================= */
       function applyTheme(theme){
-        if(theme==='dark'){ root.classList.add('dark'); $("#iconThemePath").setAttribute('d','M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z'); }
-        else{root.classList.remove('dark'); $("#iconThemePath").setAttribute('d','M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707M17.657 17.657l.707.707M12 5a7 7 0 000 14 7 7 0 000-14z'); }
+        if(theme==='dark'){
+          root.classList.add('dark');
+          $('#iconThemePath').setAttribute('d','M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z');
+        }else{
+          root.classList.remove('dark');
+          $('#iconThemePath').setAttribute('d','M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707M17.657 17.657l.707.707M12 5a7 7 0 000 14 7 7 0 000-14z');
+        }
         localStorage.setItem(KEYS.THEME,theme);
       }
 
-      /* ================= Apply Language ================= */
+      /* ================= Language ================= */
       function applyLang(lang){
-        const t = I18N[lang]||I18N.en;
-        $('#txtWelcome').textContent = t.welcome;
-        $('#txtSelectRole').textContent = t.selectRole;
-        $('#btnPatient').textContent = t.patient;
-        $('#btnStaff'  ).textContent = t.staff;
-        $('#txtSubtitle').textContent = t.subtitle;
-        $('#txtNewAppt').childNodes[2].textContent = ` ${t.newAppointment}`;
-        $('#patientName').placeholder = t.patientNamePh;
-        $('#btnAdd').textContent = t.addBooking;
-        $('#emptyState').textContent = t.noAppts;
+        const t=I18N[lang]||I18N.en;
+        $('#txtWelcome').textContent=t.welcome;
+        $('#txtSelectRole').textContent=t.selectRole;
+        $('#btnPatient').textContent=t.patient;
+        $('#btnStaff').textContent=t.staff;
+        $('#txtSubtitle').textContent=t.subtitle;
+        $('#txtNewAppt').childNodes[2].textContent=` ${t.newAppointment}`;
+        $('#patientName').placeholder=t.patientNamePh;
+        $('#btnAdd').textContent=t.addBooking;
+        $('#emptyState').textContent=t.noAppts;
         localStorage.setItem(KEYS.LANG,lang);
         render();
       }
 
-      /* ================= Storage Helpers ================= */
-      const loadAppts = () => JSON.parse(localStorage.getItem(KEYS.APPTS)||'[]');
-      const saveAppts = (data) => localStorage.setItem(KEYS.APPTS,JSON.stringify(data));
+      /* ================= Storage ================= */
+      const loadAppts=()=>JSON.parse(localStorage.getItem(KEYS.APPTS)||'[]');
+      const saveAppts=d=>localStorage.setItem(KEYS.APPTS,JSON.stringify(d));
 
-      /* ================= Role & UI ================= */
-      function promptName(){ let n = prompt('Please enter your name')||'Anonymous'; localStorage.setItem(KEYS.NAME,n.trim()); return n.trim(); }
-
-      function setRole(role){ localStorage.setItem(KEYS.ROLE,role); $('#roleOverlay').classList.add('hidden'); updateUI(role); render(); }
-
-      function updateUI(role){
-        const isStaff = role==='staff';
-        const hdr = $('#appointmentsHeader');
-        const lang = localStorage.getItem(KEYS.LANG)||'en';
-        const t = I18N[lang];
-        $('#appointments').classList.remove('hidden');
-        if(isStaff){ hdr.textContent = t.allSessions; $('#patientName').parentElement.classList.remove('hidden'); }
-        else { hdr.textContent = t.mySessions; if(!localStorage.getItem(KEYS.NAME)) promptName(); $('#patientName').value = localStorage.getItem(KEYS.NAME); $('#patientName').parentElement.classList.add('hidden'); }
+      /* ================= Role UI ================= */
+      function promptName(){
+        let n=prompt('Please enter your name')||'Anonymous';
+        localStorage.setItem(KEYS.NAME,n.trim());
+        return n.trim();
       }
 
-      function ensureRole(){ const r = localStorage.getItem(KEYS.ROLE); if(r){ updateUI(r); render(); } else $('#roleOverlay').classList.remove('hidden'); }
+      function updateUI(role){
+        const isStaff=role==='staff';
+        const lang=localStorage.getItem(KEYS.LANG)||'en';
+        const t=I18N[lang];
+        $('#appointments').classList.remove('hidden');
+        $('#appointmentsHeader').textContent=isStaff?t.allSessions:t.mySessions;
+        if(isStaff){
+          $('#patientName').parentElement.classList.remove('hidden');
+        }else{
+          if(!localStorage.getItem(KEYS.NAME)) promptName();
+          $('#patientName').value=localStorage.getItem(KEYS.NAME);
+          $('#patientName').parentElement.classList.add('hidden');
+        }
+      }
+
+      function setRole(role){
+        localStorage.setItem(KEYS.ROLE,role);
+        $('#roleOverlay').classList.add('hidden');
+        updateUI(role);
+        render();
+      }
+
+      function ensureRole(){
+        const r=localStorage.getItem(KEYS.ROLE);
+        if(r){updateUI(r);render();}else{$('#roleOverlay').classList.remove('hidden');}
+      }
 
       /* ================= Render ================= */
       function render(){
-        const role = localStorage.getItem(KEYS.ROLE);
-        const me   = localStorage.getItem(KEYS.NAME);
-        let appts  = loadAppts().sort((a,b)=>new Date(a.dateTime)-new Date(b.dateTime));
-        if(role==='patient') appts = appts.filter(a=>a.name===me);
-        const list = $('#appointmentsList'); list.innerHTML='';
-        if(!appts.length){ $('#emptyState').classList.remove('hidden'); return; }
+        const role=localStorage.getItem(KEYS.ROLE);
+        const me=localStorage.getItem(KEYS.NAME);
+        let appts=loadAppts().sort((a,b)=>new Date(a.dateTime)-new Date(b.dateTime));
+        if(role==='patient') appts=appts.filter(a=>a.name===me);
+        const list=$('#appointmentsList');
+        list.innerHTML='';
+        if(!appts.length){$('#emptyState').classList.remove('hidden');return;}
         $('#emptyState').classList.add('hidden');
         appts.forEach((a,idx)=>{
-          const li = document.createElement('li');
+          const li=document.createElement('li');
           li.className='flex justify-between items-center border-b pb-2 last:border-b-0';
           li.innerHTML=`<div><p class="font-medium">${a.name}</p><p class="text-sm text-gray-500 dark:text-gray-400">${new Date(a.dateTime).toLocaleString()}</p></div>${role==='staff'?`<button data-idx="${idx}" class="delete text-red-600 hover:text-red-800">Cancel</button>`:''}`;
           list.appendChild(li);
@@ -156,19 +172,11 @@
       }
 
       /* ================= Events ================= */
-      $('#btnPatient').onclick = () => setRole('patient');
-      $('#btnStaff').onclick   = () => setRole('staff');
+      $('#btnPatient').onclick=()=>setRole('patient');
+      $('#btnStaff').onclick=()=>setRole('staff');
 
       $('#bookingForm').addEventListener('submit',e=>{
         e.preventDefault();
-        const role = localStorage.getItem(KEYS.ROLE);
-        const name = role==='staff'?$('#patientName').value.trim():localStorage.getItem(KEYS.NAME);
-        const d    = $('#apptDate').value, t=$('#apptTime').value;
-        if(!name||!d||!t) return;
-        const appts = loadAppts(); appts.push({name,dateTime:`${d}T${t}`}); saveAppts(appts);
-        e.target.reset(); if(role==='patient') $('#patientName').value=name; render();
-      });
-
-      $('#appointmentsList').addEventListener('click',e=>{ if(e.target.matches('.delete')){ const appts=loadAppts(); appts.splice(e.target.dataset.idx,1); saveAppts(appts); render(); } });
-
-      $('#themeToggle').onclick = ()=>{
+        const role=localStorage.getItem(KEYS.ROLE);
+        const name=role==='staff'?$('#patientName').value.trim():localStorage.getItem(KEYS.NAME);
+        const d=$('#appt
