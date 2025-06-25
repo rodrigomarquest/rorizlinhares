@@ -322,12 +322,23 @@
 
       $('#bookingForm').onsubmit = e => {
         e.preventDefault();
+        console.log('Form submitted'); // Debug
+        
         const role = getStoredValue(KEYS.ROLE);
+        console.log('Current role:', role); // Debug
+        
         const nameField = $('#patientName');
         const dateField = $('#apptDate');
         const timeField = $('#apptTime');
         
+        console.log('Fields found:', {
+          nameField: !!nameField,
+          dateField: !!dateField,
+          timeField: !!timeField
+        }); // Debug
+        
         if (!dateField || !timeField) {
+          console.error('Missing required fields');
           alert('Form fields not found.');
           return;
         }
@@ -335,6 +346,7 @@
         let name;
         if (role === 'staff') {
           if (!nameField) {
+            console.error('Name field not found for staff');
             alert('Patient name field not found.');
             return;
           }
@@ -346,6 +358,7 @@
         } else {
           // Patient role - get name from storage
           name = getStoredValue(KEYS.NAME);
+          console.log('Patient name from storage:', name); // Debug
           if (!name) {
             alert('Patient name not found. Please refresh and try again.');
             return;
@@ -357,10 +370,14 @@
           return;
         }
         
+        console.log('Creating appointment:', { name, date: dateField.value, time: timeField.value }); // Debug
+        
         const dt = dateField.value + 'T' + timeField.value;
         const appts = load();
         appts.push({ n: name, dt });
         save(appts);
+        
+        console.log('Appointment saved, total appointments:', appts.length); // Debug
         
         // Reset form fields
         dateField.value = '';
@@ -424,16 +441,33 @@
 
       /* Init */
       function init() {
+        console.log('Initializing application...'); // Debug
+        
         const savedTheme = getStoredValue(KEYS.THEME) || 'light';
         setTheme(savedTheme);
         applyLang();
         
         const savedRole = getStoredValue(KEYS.ROLE);
+        console.log('Saved role:', savedRole); // Debug
+        
         if (savedRole) {
           setupRole(savedRole);
         } else {
           const overlay = $('#roleOverlay');
-          if (overlay) overlay.classList.remove('hidden');
+          if (overlay) {
+            overlay.classList.remove('hidden');
+            console.log('Showing role overlay'); // Debug
+          } else {
+            console.error('Role overlay not found'); // Debug
+          }
+        }
+        
+        // Ensure form event is attached
+        const form = $('#bookingForm');
+        if (form) {
+          console.log('Booking form found and event attached'); // Debug
+        } else {
+          console.error('Booking form not found!'); // Debug
         }
       }
 
